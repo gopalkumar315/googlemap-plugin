@@ -1,8 +1,8 @@
 <?php
 /**
  * Copyright (c) 2017.
- * Plugin Name: Google Map
- * Plugin URI: http://googleboy.in
+ * Plugin Name: Gboy Custom Google Map
+ * Plugin URI: https://github.com/gopalkumar315/googlemap-plugin
  * Description: Stylish Google Map
  * Version: 1.0
  * Author: Gopal Kumar
