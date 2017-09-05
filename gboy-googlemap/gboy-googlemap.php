@@ -67,19 +67,26 @@ if (!class_exists('GM_Plugin')) {
          * @access public
          * @return null
          */
-        public function init()
-        {
+        public function init() {
             add_action('admin_post_gm_save', array($this, 'gm_save'));
             add_shortcode('googlemap', array($this, 'embed_map'));
         }
 
-        public function embed_map($attr = array())
-        {
-            include_once wp_normalize_path(GM_PATH . '/templates/map.php');
+        /**
+         * Map Page called by Short Code
+         * @access public
+         * @return null
+         */
+        public function embed_map($attr = array()) {
+            include wp_normalize_path(GM_PATH . '/templates/map.php');
         }
 
-        public function gm_save()
-        {
+        /**
+         * Save Data
+         * @access public
+         * @return null
+         */
+        public function gm_save() {
             $table_name = $this->db->prefix . "gbgm_list";
             if ($_POST) {
                 $postData = $_POST;
@@ -92,10 +99,11 @@ if (!class_exists('GM_Plugin')) {
                     unset($postData['id']);
                     $this->db->update($table_name, $postData, array('id' => $id));
                 } else {
-                    $this->db->insert($table_name, $postData);
+                     $this->db->insert($table_name, $postData);
+                     $id = $this->db->insert_id;
                 }
             }
-            wp_redirect(admin_url('/admin.php?page=gm_list'));
+            wp_redirect(admin_url('/admin.php?page=gm_edit&id='.$id));
         }
 
         /**
@@ -181,6 +189,10 @@ function gbgm_list_table()
 		longitude VARCHAR(255) DEFAULT '' NOT NULL,
 		address TEXT DEFAULT '' NOT NULL,
 		style VARCHAR(255) DEFAULT '' NOT NULL,
+		custom_style TEXT DEFAULT '' NOT NULL,
+		map_type VARCHAR(255) DEFAULT '' NOT NULL,
+		zoom  INT DEFAULT 0 NOT NULL,
+		scroll  INT DEFAULT 0 NOT NULL,
 		height VARCHAR(255) DEFAULT '' NOT NULL,
 		icon VARCHAR(255) DEFAULT '' NOT NULL,
 		status INT DEFAULT 0 NOT NULL,		
