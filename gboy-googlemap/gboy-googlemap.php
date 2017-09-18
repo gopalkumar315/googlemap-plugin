@@ -1,4 +1,4 @@
-<?php
+<?php if ( ! defined( 'ABSPATH' ) ) exit;   // Exit if accessed directly
 /**
  * Copyright (c) 2017.
  * Plugin Name: Gboy Custom Google Map
@@ -6,25 +6,27 @@
  * Description: Stylish Google Map
  * Version: 1.0
  * Author: Gopal Kumar
- * Author URI: http://googleboy.in
+ * Author URI: https://github.com/gopalkumar315
+ * Text Domain: gboy-custom-google-map
+ * Domain Path: /languages
  */
 
 // Plugin Folder Path
-if (!defined('GM_PATH')) {
-    define('GM_PATH', plugin_dir_path(__FILE__));
+if (!defined('GBGM_PATH')) {
+    define('GBGM_PATH', plugin_dir_path(__FILE__));
 }
 
 // Plugin Folder URL
-if (!defined('GM_URL')) {
-    define('GM_URL', plugin_dir_url(__FILE__));
+if (!defined('GBGM_URL')) {
+    define('GBGM_URL', plugin_dir_url(__FILE__));
 }
 
-if (!class_exists('GM_Plugin')) {
+if (!class_exists('GBGM_Plugin')) {
 
     /**
      * The Main Class
      */
-    class GM_Plugin
+    class GBGM_Plugin
     {
         /**
          * Plugin Version
@@ -78,7 +80,7 @@ if (!class_exists('GM_Plugin')) {
          * @return null
          */
         public function embed_map($attr = array()) {
-            include wp_normalize_path(GM_PATH . '/templates/map.php');
+            include wp_normalize_path(GBGM_PATH . '/templates/map.php');
         }
 
         /**
@@ -87,6 +89,9 @@ if (!class_exists('GM_Plugin')) {
          * @return null
          */
         public function gm_save() {
+            if(! wp_verify_nonce( $_REQUEST['_wpnonce'], 'gm_save' )){
+                exit;
+            }
             $table_name = $this->db->prefix . "gbgm_list";
             if ($_POST) {
                 $postData = $_POST;
@@ -95,7 +100,7 @@ if (!class_exists('GM_Plugin')) {
                 $postData['created_at'] = date('Y-m-d H:i:s');
                 $postData['height'] = preg_replace('/(%)|(px)/', '', $postData['height']);
 
-                if ($id = $_POST['id']) {
+                if ($id = (int) $_POST['id']) {
                     unset($postData['id']);
                     $this->db->update($table_name, $postData, array('id' => $id));
                 } else {
@@ -120,7 +125,7 @@ if (!class_exists('GM_Plugin')) {
         }
 
         public function gm_add() {
-            include_once wp_normalize_path(GM_PATH . '/templates/add.php');
+            include_once wp_normalize_path(GBGM_PATH . '/templates/add.php');
         }
 
         /**
@@ -129,7 +134,7 @@ if (!class_exists('GM_Plugin')) {
          * return null
          */
         public function setting() {
-            include_once wp_normalize_path(GM_PATH . '/templates/setting.php');
+            include_once wp_normalize_path(GBGM_PATH . '/templates/setting.php');
         }
 
         /**
@@ -138,7 +143,7 @@ if (!class_exists('GM_Plugin')) {
          * return null
          */
         public function gm_list() {
-            include_once wp_normalize_path(GM_PATH . '/templates/list.php');
+            include_once wp_normalize_path(GBGM_PATH . '/templates/list.php');
         }
 
         /**
@@ -150,8 +155,8 @@ if (!class_exists('GM_Plugin')) {
             if ($hook != 'google-map_page_gm_list') {
                 return '';
             }
-            wp_enqueue_style('gm_datatable_css', GM_URL . 'css/datatable.min.css', false, 1.1);
-            wp_enqueue_script('gm_datatable_js', GM_URL . 'js/datatable.min.js', false, 1.1);
+            wp_enqueue_style('gm_datatable_css', GBGM_URL . 'css/datatable.min.css', false, 1.1);
+            wp_enqueue_script('gm_datatable_js', GBGM_URL . 'js/datatable.min.js', false, 1.1);
         }
 
         /**
@@ -170,7 +175,7 @@ if (!class_exists('GM_Plugin')) {
 }
 
 // load the instance of plugin
-add_action('plugins_loaded', array('GM_Plugin', 'get_instance'));
+add_action('plugins_loaded', array('GBGM_Plugin', 'get_instance'));
 
 /**
  * setup database

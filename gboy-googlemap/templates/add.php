@@ -12,7 +12,7 @@
 global $wpdb;
 $table_name = $wpdb->prefix . 'gbgm_list';
 if(isset($_GET['id'])) {
-    $id = $_GET['id'];
+    $id = (int) $_GET['id'];
     $mapData = $wpdb->get_row("SELECT * FROM $table_name where id = $id");
 }
 ?>
@@ -46,7 +46,8 @@ if(isset($_GET['id'])) {
 
     ?>
     <h2><?php echo (@$mapData)?'Update':'Add'; ?> Google Map</h2>
-    <form method="post" action="<?php echo admin_url( 'admin-post.php?action=gm_save' ); ?>">
+    <?php $nonce = wp_create_nonce( 'gm_save' );?>
+    <form method="post" action="<?php echo admin_url( 'admin-post.php?action=gm_save&_wpnonce='.$nonce ); ?>">
 
         <p><strong>Title:</strong><br />
             <input type="text" name="title" size="45" required="required" value="<?php echo @$mapData->title?>" />
