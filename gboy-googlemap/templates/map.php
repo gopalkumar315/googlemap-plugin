@@ -1,13 +1,16 @@
 <?php
 /**
  * Copyright (c) 2017.
- * Plugin Name: Google Map
- * Plugin URI: http://googleboy.in
+ * Plugin Name: Gboy Custom Google Map
+ * Plugin URI: https://github.com/gopalkumar315/googlemap-plugin
  * Description: Stylish Google Map
  * Version: 1.0
- * Author: Gopal Kumar
- * Author URI: http://googleboy.in
+ * Author: Ehues
+ * Author URI: http://ehues.com
+ * Text Domain: gboy-custom-google-map
+ * Domain Path: /languages
  */
+
 if (isset($attr['id'])):
     global $wpdb;
     $id = $attr['id'];
@@ -144,11 +147,9 @@ if (isset($attr['id'])):
                 <?php endif;?>
             }
         </script>
-        <?php $gmScript = 'https://maps.googleapis.com/maps/api/js?callback=initMap_' . $mapData->id; ?>
-        <?php if ($key = get_option('gbgm_key')): ?>
-            <?php $gmScript .= '&key=' . $key; ?>
-        <?php endif; ?>
-        <script async defer src="<?php echo $gmScript; ?>"></script>
+        <script>
+            window.addEventListener("load", initMap_<?php echo $mapData->id;?>, false);
+        </script>
     <?php endif; ?>
 <?php endif; ?>
 

@@ -1,16 +1,16 @@
-<?php if ( ! defined( 'ABSPATH' ) ) exit;   // Exit if accessed directly
+<?php if( ! defined( 'ABSPATH' ) ) exit;   // Exit if accessed directly
 /**
  * Copyright (c) 2017.
  * Plugin Name: Gboy Custom Google Map
  * Plugin URI: https://github.com/gopalkumar315/googlemap-plugin
  * Description: Stylish Google Map
- * Version: 1.0
- * Author: Gopal Kumar
- * Author URI: https://github.com/gopalkumar315
+ * Version: 1.2
+ * Author: Ehues
+ * Author URI: http://ehues.com
  * Text Domain: gboy-custom-google-map
  * Domain Path: /languages
  */
-
+ 
 // Plugin Folder Path
 if (!defined('GBGM_PATH')) {
     define('GBGM_PATH', plugin_dir_path(__FILE__));
@@ -80,7 +80,11 @@ if (!class_exists('GBGM_Plugin')) {
          * @return null
          */
         public function embed_map($attr = array()) {
+            ob_start();
             include wp_normalize_path(GBGM_PATH . '/templates/map.php');
+            $content = ob_get_clean();
+            wp_enqueue_script('gboy_googlemap_js',$this->getGoogleMapJs(), false, 1.1);
+            return $content;
         }
 
         /**
@@ -160,6 +164,23 @@ if (!class_exists('GBGM_Plugin')) {
         }
 
         /**
+         * Duplicate the location row
+         * @access public
+         * @return null
+         */
+        public function gm_duplicate()
+        {
+            $table_name = $this->db->prefix . "gbgm_list";
+            if(isset($_GET['id'])) {
+                $id = (int) $_GET['id'];
+                $locationData = $this->db->get_row("SELECT * FROM $table_name where id = $id",ARRAY_A);
+                unset($locationData['id']);
+                $this->db->insert($table_name, $locationData);
+            }
+            wp_redirect('admin.php?page=gm_list');
+        }
+
+        /**
          * GM Admin Menu
          * @access public
          */
@@ -169,6 +190,20 @@ if (!class_exists('GBGM_Plugin')) {
             add_submenu_page('gm_setting', 'List', 'List', 'manage_options', 'gm_list', array($this, 'gm_list'));
             add_submenu_page(null, '', '', 'administrator', 'gm_add', array($this, 'gm_add'));
             add_submenu_page(null, '', '', 'administrator', 'gm_edit', array($this, 'gm_add'));
+            add_submenu_page(null, '', '', 'administrator', 'gm_duplicate', array($this, 'gm_duplicate'));
+        }
+
+        /**
+         * Get Google Map Js File Link
+         * @return string
+         */
+        public function getGoogleMapJs()
+        {
+            $gmScript = 'https://maps.googleapis.com/maps/api/js';
+            if($key = get_option('gbgm_key')) {
+                $gmScript .= '?key=' . $key;
+            }
+            return $gmScript;
         }
 
     }
@@ -186,7 +221,6 @@ function gbgm_list_table()
     global $wpdb;
     $charset_collate = $wpdb->get_charset_collate();
     $table_name = $wpdb->prefix . 'gbgm_list';
-
     $sql = "CREATE TABLE $table_name (
 		id INT NOT NULL AUTO_INCREMENT,
         title VARCHAR(255) DEFAULT '' NOT NULL,
@@ -208,5 +242,4 @@ function gbgm_list_table()
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta($sql);
 }
-
 register_activation_hook(__FILE__, 'gbgm_list_table');
